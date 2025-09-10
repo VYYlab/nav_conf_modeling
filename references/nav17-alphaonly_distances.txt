@@ -1,0 +1,10 @@
+chain1 res1 atom1 chain2 res2 atom2 tag
+A 163  CA    A 214  CA    VSDI
+A 776  CA    A 824  CA    VSDII
+A 1226 CA    A 1276 CA    VSDIII
+A 1547 CA    A 1599 CA    VSDIV
+A 398  CA    A 1442 CA    AG1
+A 953  CA    A 1745 CA    AG2
+A 1462 CA    A 1635 CA    IFM
+A 361  CA    A 1395 CA    SF
+

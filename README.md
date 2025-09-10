@@ -78,7 +78,9 @@ All distances and residue subsets used in this study are summarized in `referenc
 - **plddt partner**: Residue ranges for the partner protein (β-subunit or CaM) when present; `NA` if not applicable.  
 - **List of reference pdbs**: PDB identifiers of experimental structures used as references for the corresponding case; `NA` if not available.
 
+
 This table provides the central reference for both structural metrics (distances) and regional confidence analysis (pLDDT subsets) used throughout the study.
+
 ---
 
 ## 3. Generating the models
@@ -90,4 +92,171 @@ Models are generated using [local ColabFold](https://github.com/YoshitakaMo/loca
 colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
 --num-seeds 20 \
 --templates --max-seq 256 --max-extra-seq 512 \
---num-recycle 6 --save-recycles inputs/nav1.7_alphaonly.fasta outputs/nav1.7_alphaonly/ ```
+--num-recycle 6 --save-recycles inputs/hNaV1.7-alpha-only.fa outputs/hNaV1.7-alpha-only/ ```
+```
+**Explanation of arguments:**
+
+- `--num-models 5`  
+  Number of AlphaFold2 models to generate per random seed.
+
+- `--model-type auto`  
+  Automatically selects the best model configuration depending on the input (monomer or multimer).
+
+- `--msa-mode mmseqs2_uniref_env`  
+  Specifies the database and method used to generate multiple sequence alignments (MSAs).
+
+- `--num-seeds 20`  
+  Number of random seeds for initialization. Each seed explores different stochastic trajectories of the network.
+
+- `--templates`  
+  Enables the use of template structures if available in the database or provided by the user.
+
+- `--max-seq 256`  
+  Maximum number of sequences randomly subsampled from the full MSA.  
+  **Key parameter for the subsampled MSA approach.**
+
+- `--max-extra-seq 512`  
+  Maximum number of additional sequences selected around each cluster center.  
+  **Together with `--max-seq`, this parameter controls the degree of subsampling.**
+
+- `--num-recycle 6`  
+  Number of recycling iterations (re-feeding the structure back into the network to refine predictions).
+
+- `--save-recycles`  
+  Saves the intermediate model at each recycle step (from recycle 0 to recycle 6).
+
+- `inputs/nav1.7_alphaonly.fasta`  
+  Input FASTA file containing the sequence(s) to model.
+
+- `outputs/nav1.7_alphaonly/`  
+  Output directory where all generated models and metadata will be stored.
+
+---
+
+**Important note on model counts:**  
+This example run uses **20 seeds × 5 models = 100 models per case**.  
+Since intermediate models from recycle 0 through 6 are saved (`--save-recycles`), each model produces **7 structures**.  
+Thus, the total output is **100 × 7 = 700 models** stored in the output directory defined by the user.
+
+### 3.1 Running with custom templates
+
+In addition to the default template mode (where AlphaFold automatically selects templates from a curated version of the PDB), we also tested the effect of **state-specific custom templates**. As described in the manuscript, this analysis was performed for **NaV1.7**, focusing on VSDII, which has several experimental structures captured in the deactivated conformation. In particular, two chimeric structures were used as templates:
+
+- **PDB 6N4R** (Xu et al., 2019)  
+- **PDB 7K48** (Wisedchaisri et al., 2020)
+
+Both are NaVAb-based chimeras containing the human NaV1.7 VSDII sequence, stabilized in the deactivated state by peptide toxins. 
+
+To run ColabFold in **custom template mode**, we used exactly the same options as in Section 3, but added the flag:
+
+- `--custom-template-path $PATH`  
+  where `$PATH` points to the folder containing the desired template PDBs (in this repository, we provide them under `custom_templates/`).
+
+**Example execution:**
+
+```bash
+colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
+--num-seeds 20 \
+--templates --max-seq 256 --max-extra-seq 512 \
+--num-recycle 6 --save-recycles \
+--custom-template-path ./custom_templates/ \
+inputs/hNaV1.7-alpha-only.fa outputs/hNaV1.7-alpha-only_customtemplates/
+```
+
+## 4. Analyze models
+
+This section illustrates how to compute (i) **distance coordinates** and (ii) **regional pLDDT subsets** from a folder containing all the PDB models for a given case. We keep the running example from above and assume the output directory is: outputs/hNaV1.7-alpha-only/
+
+A typical layout (abbreviated) after a ColabFold run with `--save-recycles` is:
+
+```bash
+ll outputs/nav1.7_alphaonly/
+# total ...
+# -rw-r--r--  model_000_seed_000.r0.pdb
+# -rw-r--r--  model_000_seed_000.r1.pdb
+# ...
+# -rw-r--r--  model_004_seed_019.r6.pdb
+```
+
+We provide two scripts under `scripts/`:
+- `calculate_distances.py` → computes atom–atom distances defined in a **metrics** file.  
+- `subset_plddt.py` → computes average pLDDT on residue **subsets** defined in a **regions** file.  
+
+Both scripts take:
+- `--source` → the directory with all the PDBs to analyze.  
+- A second argument file:  
+  - `--metrics <file>` specifying atom pairs for distance calculations of residue ranges for subset pLDDT calculation
+
+> **Note on tags.** Each line in the input TXT defines a **tag** that becomes the column name in the resulting CSV. Use stable, descriptive tags (e.g., `VSDI`, `VSDII`, `AG1`, `IFM`, `SF`, `plddt_VSDI`, …).
+
+### 4.1 Distance coordinates
+
+Create a plain-text **metrics** file that lists atom pairs (chain, residue index, atom name) per line with a trailing **tag**. Below is an example for **NaV1.7**, derived directly from the reference table (see `references/distances-and-subsets.csv`, row `NaV1.7`):
+
+**`references/nav17-alphaonly_distances.txt`**
+
+chain1 res1 atom1 chain2 res2 atom2 tag
+A 163  CA    A 214  CA    VSDI
+A 776  CA    A 824  CA    VSDII
+A 1226 CA    A 1276 CA    VSDIII
+A 1547 CA    A 1599 CA    VSDIV
+A 398  CA    A 1442 CA    AG1
+A 953  CA    A 1745 CA    AG2
+A 1462 CA    A 1635 CA    IFM
+A 361  CA    A 1395 CA    SF
+
+Run the distance calculation:
+
+```bash
+python scripts/calculate_distances.py \
+  --source outputs/hNaV1.7-alpha-only/ \
+  --metrics references/nav17-alphaonly_distances.txt
+  ```
+
+**Output**: a CSV file outputs/hNaV1.7-alpha-only/distances.csv with one row per PDB and one column per tag. Example columns: filename,VSDI,VSDII,VSDIII,VSDIV,AG1,AG2,IFM,SF.
+
+### 4.2 pLDDT subsets
+
+Create a plain-text **regions** file listing residue ranges (comma-separated if multiple segments) and a **tag** for each subset. Again, for **NaV1.7** we take ranges from the reference table:
+
+- `plddt full` → `A17-430,A701-991,A1163-1897`  
+- `plddt VSDI` → `A114-228`  
+- `plddt VSDII` → `A717-838`  
+- `plddt VSDIII` → `A1169-1293`  
+- `plddt VSDIV` → `A1492-1616`  
+- `plddt AG` → `A397-399,A952-954,A1441-1443,A1744-1746`  
+- `plddt IFM` → `A1461-1463`  
+- `plddt SF` → `A359-363,A913-918,A1392-1397,A1685-1689`  
+
+**`references/nav17-alphaonly_ranges.txt`**
+
+range tag
+A17-430,A701-991,A1163-1897 plddt_full
+A114-228 plddt_VSDI
+A717-838 plddt_VSDII
+A1169-1293 plddt_VSDIII
+A1492-1616 plddt_VSDIV
+A397-399,A952-954,A1441-1443,A1744-1746 plddt_AG
+A1461-1463 plddt_IFM
+A359-363,A913-918,A1392-1397,A1685-1689 plddt_SF
+
+Run the subset pLDDT calculation:
+
+```bash
+python scripts/subset_plddt.py \
+  --source outputs/hNaV1.7-alpha-only/ \
+  --metrics references/nav17-alphaonly_ranges.txt
+```
+
+**Output**: a CSV file outputs/hNaV1.7-alpha-only/plddt_subsets.csv with columns like filename,plddt_full,plddt_VSDI,...,plddt_SF.
+
+### 4.3 Merging results and example output
+
+Join distance and pLDDT tables on filename to obtain a single analysis table suitable for plotting or further statistics (e.g., in Python/pandas, R, or your tool of choice). A typical merged CSV resembles:
+
+filename,plddt_full,plddt_VSDI,plddt_VSDII,plddt_VSDIII,plddt_VSDIV,plddt_AG,plddt_IFM,plddt_SF,VSDI,VSDII,VSDIII,VSDIV,AG1,AG2,IFM,SF
+...
+
+This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tags).
+
+**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets are directly comparable.
