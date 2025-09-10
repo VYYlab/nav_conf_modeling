@@ -171,7 +171,7 @@ This section illustrates how to compute (i) **distance coordinates** and (ii) **
 A typical layout (abbreviated) after a ColabFold run with `--save-recycles` is:
 
 ```bash
-ll outputs/nav1.7_alphaonly/
+ll outputs/hNaV1.7-alpha-only/
 # total ...
 # -rw-r--r--  model_000_seed_000.r0.pdb
 # -rw-r--r--  model_000_seed_000.r1.pdb
@@ -263,6 +263,6 @@ filename,plddt_full,plddt_VSDI,plddt_VSDII,plddt_VSDIII,plddt_VSDIV,plddt_AG,pld
 ...
 ```
 
-This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tags).
+This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tag names).
 
 >**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets from different study cases are directly comparable.
