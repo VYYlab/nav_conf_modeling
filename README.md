@@ -72,7 +72,7 @@ All distances and residue subsets used in this study are summarized in `referenc
 - **AG1, AG2**: Atom pairs defining the activation gate distances (S6I–S6III and S6II–S6IV).  
 - **IFM**: Atom pair between IFM phenylalanine and the aspartate in the pore binding site.  
 - **SF**: Atom pair within the DEKA motif to monitor selectivity filter dilation.  
-- **plddt full**: Residue ranges covering the entire α-subunit, used for overall pLDDT averaging.  
+- **plddt full**: Residue ranges covering the entire α-subunit excluding unstructured flexible loops, used for overall pLDDT averaging.  
 - **plddt VSDI–VSDIV**: Residue ranges defining each VSD for regional pLDDT analysis.  
 - **plddt AG, plddt IFM, plddt SF**: Residue ranges for the activation gate, IFM motif, and selectivity filter.  
 - **plddt partner**: Residue ranges for the partner protein (β-subunit or CaM) when present; `NA` if not applicable.  
