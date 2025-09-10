@@ -33,19 +33,58 @@ All sequences were retrieved from UniProt (see manuscript for accession codes). 
 
 ## 2. Defining distances and subsets
 
-In order to assign NaV channel models to specific conformational states, we analyzed structural features known to change during gating and inactivation. These include distances between specific residues and atoms located in flexible regions of the channel that are sensitive to conformational transitions.
+In order to assign NaV channel models to specific conformational states, we analyzed structural regions known to change during Nav conformational cycle and that have already been described in experimental strucutres. These include distances between specific residues and atoms located in  regions of the channel that are sensitive to conformational transitions:
+
+- **Voltage-sensing domains (VSDs I–IV):**  
+  Distance between the Cα of the first gating charge in the S4 helix (GC1-S4) and the Cα of the hydrophobic constriction site residue in the S2 helix (HC-S2).  
+  - Large values → activated (“up”) VSD state.  
+  - Small values → deactivated (“down”) VSD state.
+
+- **Activation gate (AG):**  
+  Distances between opposing Cα atoms in the S6 helices that form the hydrophobic intracellular gate.  
+  - AG1 = S6I–S6III pair  
+  - AG2 = S6II–S6IV pair  
+  These values indicate whether the pore is open or closed.
+
+- **Fast inactivation (IFM motif):**  
+  Distance between the Cα of the phenylalanine in the IFM motif and the Cα of the aspartate in its binding site in the pore domain.  
+  - Low values → IFM motif bound, channel in fast-inactivated state.  
+
+- **Selectivity filter (SF):**  
+  Distance between the Cα of the lysine and aspartate residues of the DEKA motif.  
+  - Variations reflect dilation or constriction of the selectivity filter, associated with slow inactivation.
+
+To benchmark the models, the same distances were also measured in available experimental structures of human NaV channels and selected non-human NaV channels representing distinct conformational states.
+
 
 ![Regions of interest in NaV channels](figures/Figure1.png)
 
-The reference table of atom pairs is provided in `distances/atom_pairs.tsv`. This file defines which residues and atoms should be used for distance calculations. Each row specifies the pair and includes a `tag` field, which is used as the column name in the resulting dataset.
+---
 
-In addition, subsets of residues are defined for pLDDT analysis, corresponding to regions of interest (e.g., individual VSDs, the pore domain, the IFM motif). These subsets allow us to quantify the confidence of AlphaFold2 predictions in specific structural elements.
+### Structure of the reference table
 
+All distances and residue subsets used in this study are summarized in `references/distances-and-subsets.csv`. Each row corresponds to a modeling case (e.g., NaV1.1, NaV1.7) and provides both the atom pairs for distance calculations and the residue ranges for pLDDT analysis.
+
+**File structure (columns):**
+
+- **Modeling case**: Channel subtype (e.g., NaV1.1, NaV1.2, NaV1.7).  
+- **VSDI, VSDII, VSDIII, VSDIV**: Atom pairs defining the GC1–HC distances for each VSD.  
+- **AG1, AG2**: Atom pairs defining the activation gate distances (S6I–S6III and S6II–S6IV).  
+- **IFM**: Atom pair between IFM phenylalanine and the aspartate in the pore binding site.  
+- **SF**: Atom pair within the DEKA motif to monitor selectivity filter dilation.  
+- **plddt full**: Residue ranges covering the entire α-subunit, used for overall pLDDT averaging.  
+- **plddt VSDI–VSDIV**: Residue ranges defining each VSD for regional pLDDT analysis.  
+- **plddt AG, plddt IFM, plddt SF**: Residue ranges for the activation gate, IFM motif, and selectivity filter.  
+- **plddt partner**: Residue ranges for the partner protein (β-subunit or CaM) when present; `NA` if not applicable.  
+- **List of reference pdbs**: PDB identifiers of experimental structures used as references for the corresponding case; `NA` if not available.
+
+This table provides the central reference for both structural metrics (distances) and regional confidence analysis (pLDDT subsets) used throughout the study.
 ---
 
 ## 3. Generating the models
 
-Models are generated using [ColabFold](https://github.com/sokrypton/ColabFold), specifically with the **subsampled MSA approach** described in the paper. Example command:
+Models are generated using [local ColabFold](https://github.com/YoshitakaMo/localcolabfold), specifically with the **subsampled MSA approach** described in the paper [High-throughput prediction of protein conformational distributions with subsampled AlphaFold2
+](https://www.nature.com/articles/s41467-024-46715-9). Example command:
 
 ```bash
 colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
