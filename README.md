@@ -265,4 +265,4 @@ filename,plddt_full,plddt_VSDI,plddt_VSDII,plddt_VSDIII,plddt_VSDIV,plddt_AG,pld
 
 This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tags).
 
->**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets are directly comparable.
+>**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets from different study cases are directly comparable.
