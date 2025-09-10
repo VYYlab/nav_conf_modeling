@@ -133,10 +133,11 @@ colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
 
 ---
 
-**Important note on model counts:**  
-This example run uses **20 seeds × 5 models = 100 models per case**.  
-Since intermediate models from recycle 0 through 6 are saved (`--save-recycles`), each model produces **7 structures**.  
-Thus, the total output is **100 × 7 = 700 models** stored in the output directory defined by the user.
+>**Important note on model counts:**  
+>This run uses **20 seeds × 5 models = 100 models per case**.  
+>Since intermediate models from recycle 0 through 6 are saved (`--save-recycles`), each model produces **7 structures**.  
+>Thus, the total output is **100 × 7 = 700 models** stored in the output directory defined by the user.
+>This is the number of models we generated in all cases for our study. 
 
 ### 3.1 Running with custom templates
 
@@ -195,15 +196,17 @@ Create a plain-text **metrics** file that lists atom pairs (chain, residue index
 
 **`references/nav17-alphaonly_distances.txt`**
 
-chain1 res1 atom1 chain2 res2 atom2 tag
-A 163  CA    A 214  CA    VSDI
-A 776  CA    A 824  CA    VSDII
-A 1226 CA    A 1276 CA    VSDIII
-A 1547 CA    A 1599 CA    VSDIV
-A 398  CA    A 1442 CA    AG1
-A 953  CA    A 1745 CA    AG2
-A 1462 CA    A 1635 CA    IFM
-A 361  CA    A 1395 CA    SF
+```
+chain1 res1 atom1 chain2 res2 atom2 tag  
+A 163  CA    A 214  CA    VSDI  
+A 776  CA    A 824  CA    VSDII  
+A 1226 CA    A 1276 CA    VSDIII  
+A 1547 CA    A 1599 CA    VSDIV  
+A 398  CA    A 1442 CA    AG1  
+A 953  CA    A 1745 CA    AG2  
+A 1462 CA    A 1635 CA    IFM  
+A 361  CA    A 1395 CA    SF  
+```
 
 Run the distance calculation:
 
@@ -230,6 +233,7 @@ Create a plain-text **regions** file listing residue ranges (comma-separated if 
 
 **`references/nav17-alphaonly_ranges.txt`**
 
+```
 range tag
 A17-430,A701-991,A1163-1897 plddt_full
 A114-228 plddt_VSDI
@@ -239,6 +243,7 @@ A1492-1616 plddt_VSDIV
 A397-399,A952-954,A1441-1443,A1744-1746 plddt_AG
 A1461-1463 plddt_IFM
 A359-363,A913-918,A1392-1397,A1685-1689 plddt_SF
+```
 
 Run the subset pLDDT calculation:
 
@@ -253,10 +258,11 @@ python scripts/subset_plddt.py \
 ### 4.3 Merging results and example output
 
 Join distance and pLDDT tables on filename to obtain a single analysis table suitable for plotting or further statistics (e.g., in Python/pandas, R, or your tool of choice). A typical merged CSV resembles:
-
+```
 filename,plddt_full,plddt_VSDI,plddt_VSDII,plddt_VSDIII,plddt_VSDIV,plddt_AG,plddt_IFM,plddt_SF,VSDI,VSDII,VSDIII,VSDIV,AG1,AG2,IFM,SF
 ...
+```
 
 This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tags).
 
-**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets are directly comparable.
+>**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets are directly comparable.
