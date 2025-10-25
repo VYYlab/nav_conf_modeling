@@ -332,7 +332,7 @@ filename,plddt_full,plddt_VSDI,plddt_VSDII,plddt_VSDIII,plddt_VSDIV,plddt_AG,pld
 ...
 ```
 
-This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tag names).
+This mirrors the structure of the **all the resulting tables from this study** that can be found in the `output_tables` folder provided in the repository (columns may vary with your chosen tag names).
 
 >**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets from different study cases are directly comparable.
 
@@ -366,18 +366,17 @@ clustering_analysis/
 ## 6. Data availability & model retrieval
 
 - The complete **3D model ensembles** for all cases will be available on **Dryad**: *https://doi.org/10.5061/dryad.rn8pk0pn3*. Each Dryad package mirrors this repository’s case naming (e.g., `hNaV1.7-alphaOnly`).
-- Using the CSVs in the folders above, the community can **search for specific models** (desired state coordinates and confidence) and then retrieve the corresponding PDB from the Dryad bundle.
+- Using the CSVs in the `output_tables` folder, the community can **search for specific models** (desired state coordinates and confidence) and then retrieve the corresponding PDB from the Dryad bundle.
 
 **Example workflow (NaV1.7 α-subunit only):**
 1. Download the Dryad bundle for *hNaV1.1-alphaOnly.tar.gz* models.
-2. Open `correlation_analysis/AlphaOnly/data/NaV1.7-alphaOnly.csv`.
+2. Open `output_tables/NaV1.7-alphaOnly.csv`.
 3. Filter by column values to locate models with the features you need, e.g.:
    - `VSDII < 13` (more deactivated VSDII)
    - `IFM < 10` (IFM bound)
-   - `AG_area` between `160` and `190` Å² (narrow/closed–like gate)
    - `plddt_VSDII > 80` (high confidence in VSDII)
 4. Use the `filename` column to find the exact PDB file in the Dryad package (e.g., `_hNaV1.7-alpha-only_unrelaxed_rank_087_alphafold2_ptm_model_5_seed_034.r5.pdb`).
 
-> Tip: keep tags/column names consistent across cases (e.g., `VSDI–VSDIV`, `AG1/AG2`, `IFM`, `SF`, `AG_area`, `plddt_*`...) so that filtering and cross-case comparisons are straightforward.
+> Note: tags/column names are consistent across cases (e.g., `VSDI–VSDIV`, `AG1/AG2`, `IFM`, `SF`, `plddt_*`...) so that filtering and cross-case comparisons are straightforward.
 
 
