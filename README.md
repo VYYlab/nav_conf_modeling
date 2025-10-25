@@ -6,11 +6,11 @@ This repository accompanies the manuscript *Exploring voltage-gated sodium chann
 The goal of the study is to evaluate the capability of AlphaFold2 to sample multiple conformational states of voltage-gated sodium (NaV) channels, and to assess the accuracy of AlphaFold Multimer in modeling interactions between the NaV α-subunit and its key protein partners, including auxiliary β-subunits and calmodulin (CaM).  
 
 The work addresses five main research questions:  
-1. Does AlphaFold2 generate a single state or multiple distinct conformations when modeling full NaV channels?  
-2. What is the range and extent of conformational states that can be sampled?  
-3. Which modeling settings (e.g., number of recycles, use of custom templates) influence the states obtained?  
-4. Can AlphaFold Multimer reproduce experimentally observed NaV α–partner complexes?  
-5. Does the presence of protein partners alter the conformational landscape of the NaV α-subunit?  
+1. Does applying a subsampled AlphaFold2 approach and generating multiple models of a full NaV channel allow sampling multiple distinct conformations beyond a single state?  
+2. What is the range of conformational states that can be sampled with this approach, and how do the resulting state distributions correlate across functional regions?  
+3. Which factors influence the states obtained?  
+4. Can AlphaFold Multimer reproduce experimentally observed complexes of the NaV α-subunit with its native partners?  
+5. Does the presence of these partners alter the modeled conformational landscape of the α-subunit?  
 
 This repository provides a **step-by-step guide** to reproduce the main results of the paper. It contains all required input files, scripts, and instructions for running the modeling, calculating conformational metrics, and analyzing the resulting ensembles.
 
@@ -19,6 +19,8 @@ The workflow is divided into four stages:
 2. **Define distances and regional subsets**  
 3. **Generate models with ColabFold**  
 4. **Analyze models (distances and pLDDT subsets)**  
+5. **Correlation and clustering analysis**  
+6. **Data availability & model retrieval**  
 
 ---
 
@@ -357,25 +359,25 @@ clustering_analysis/
 └─ data/   # combined tables used for joint clustering/UMAP
 ```
 
-- The **`data/`** subfolders contain the **final CSV tables** produced in this study (e.g., `NaV1.7-alphaOnly.csv`, `NaV1.1-beta1.csv`). Each row is a single model; columns include distance-based state coordinates (e.g., VSDI–VSDIV, AG1/AG2, IFM, SF), confidence metrics (global and subset **pLDDT**), **RMSDs to experimental reference structures**, and metadata such as `filename` (from which the recycle index can be extracted).
+- The **`data/`** subfolders contain the **final CSV tables** produced in this study (e.g., `NaV1.7-alphaOnly.csv`, `NaV1.1-beta1.csv`). Each row is a single model; columns include distance-based state coordinates (e.g., VSDI–VSDIV, AG1/AG2, IFM, SF), confidence metrics (global and subset **pLDDT**), **RMSDs to experimental reference structures**, and metadata such as `filename` (from which the recycle index can be parsed).
 - The notebooks (`*final.ipynb`) are configured to **run out-of-the-box** using the corresponding `data/` CSVs to reproduce the **figures and statistics** reported in the paper (correlations, mutual information heatmaps, recycle trends, etc.). Minimal editing should be required beyond adjusting paths if you move the repository.
 
 
 ## 6. Data availability & model retrieval
 
-- The complete **3D model ensembles** for all cases will be available on **Dryad**: *[DOI link placeholder]*. Each Dryad package mirrors this repository’s case naming (e.g., `hNaV1.7-alpha-only`).
+- The complete **3D model ensembles** for all cases will be available on **Dryad**: *https://doi.org/10.5061/dryad.rn8pk0pn3*. Each Dryad package mirrors this repository’s case naming (e.g., `hNaV1.7-alphaOnly`).
 - Using the CSVs in the folders above, the community can **search for specific models** (desired state coordinates and confidence) and then retrieve the corresponding PDB from the Dryad bundle.
 
 **Example workflow (NaV1.7 α-subunit only):**
-1. Download the Dryad bundle for *NaV1.7 α-only* models.
+1. Download the Dryad bundle for *hNaV1.1-alphaOnly.tar.gz* models.
 2. Open `correlation_analysis/AlphaOnly/data/NaV1.7-alphaOnly.csv`.
 3. Filter by column values to locate models with the features you need, e.g.:
    - `VSDII < 13` (more deactivated VSDII)
    - `IFM < 10` (IFM bound)
    - `AG_area` between `160` and `190` Å² (narrow/closed–like gate)
    - `plddt_VSDII > 80` (high confidence in VSDII)
-4. Use the `filename` column to find the exact PDB file in the Dryad package (e.g., `model_000_seed_012.r0.pdb`).
+4. Use the `filename` column to find the exact PDB file in the Dryad package (e.g., `_hNaV1.7-alpha-only_unrelaxed_rank_087_alphafold2_ptm_model_5_seed_034.r5.pdb`).
 
-> Tip: keep tags/column names consistent across cases (e.g., `VSDI–VSDIV`, `AG1/AG2`, `IFM`, `SF`, `AG_area`, `plddt_*`, `recycle`) so that filtering and cross-case comparisons are straightforward.
+> Tip: keep tags/column names consistent across cases (e.g., `VSDI–VSDIV`, `AG1/AG2`, `IFM`, `SF`, `AG_area`, `plddt_*`...) so that filtering and cross-case comparisons are straightforward.
 
 
