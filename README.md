@@ -171,6 +171,38 @@ colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
 inputs/hNaV1.7-alpha-only.fa outputs/hNaV1.7-alpha-only_customtemplates/
 ```
 
+### 3.2 Running multimer modeling (α + partner complexes)
+
+To evaluate how auxiliary subunits influence NaV α-subunit conformations, we modeled a subset of biologically relevant complexes, including all β-subunits (β1–β4)with NaV1.1 and NaV1.7, and calmodulin (CaM) with NaV1.2 and NaV1.5.
+
+Multimer modeling in ColabFold is enabled automatically when **multiple protein sequences are placed on the same FASTA line**, separated by a colon `:`.  
+This syntax instructs AlphaFold/ColabFold to treat the proteins as **interacting chains**.
+
+Example input FASTA (see: `inputs/hNaV1.7-beta1.fa`):
+
+```
+>hNaV1.7-beta1
+MA...SKK:MGR...VAE
+```
+
+Where:
+- The **first sequence** corresponds to the NaV α-subunit  
+- The **second sequence** corresponds to the β1-subunit partner  in this case
+- The colon `:` indicates a **chain break** 
+
+**Example execution:**
+
+```bash
+colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
+--num-seeds 20 \
+--templates --max-seq 256 --max-extra-seq 512 \
+--num-recycle 6 --save-recycles \
+inputs/hNaV1.7-beta1.fa outputs/hNaV1.7-beta1/
+```
+
+The resulting output folder will contain the full multimeric complex predictions, including one model file per recycle iteration (e.g., `...r0.pdb`, `...r6.pdb`) for each model and random seed.
+
+
 ## 4. Analyze models
 
 This section illustrates how to compute:
