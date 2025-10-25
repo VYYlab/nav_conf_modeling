@@ -94,6 +94,11 @@ colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
 --templates --max-seq 256 --max-extra-seq 512 \
 --num-recycle 6 --save-recycles inputs/hNaV1.7-alpha-only.fa outputs/hNaV1.7-alpha-only/ ```
 ```
+> **Note on input sequences.**  
+> All sequences used in this study are provided in  
+> `references/input-sequences.csv`, including protein names, UniProt accessions,  
+> and the exact sequences used for each modeling case.
+
 **Explanation of arguments:**
 
 - `--num-models 5`  
@@ -166,7 +171,16 @@ inputs/hNaV1.7-alpha-only.fa outputs/hNaV1.7-alpha-only_customtemplates/
 
 ## 4. Analyze models
 
-This section illustrates how to compute (i) **distance coordinates** and (ii) **regional pLDDT subsets** from a folder containing all the PDB models for a given case. We keep the running example from above and assume the output directory is: outputs/hNaV1.7-alpha-only/
+This section illustrates how to compute:
+1. **Distance coordinates** from atom pairs  
+2. **Regional pLDDT subsets**  
+3. **RMSD to reference structures**  
+4. **ipTM scores** (from `.json` metadata or a `.log` file)
+
+We keep the running example and assume all PDB models for a case are stored under:
+```
+outputs/hNaV1.7-alpha-only/
+```
 
 A typical layout (abbreviated) after a ColabFold run with `--save-recycles` is:
 
@@ -179,16 +193,69 @@ ll outputs/hNaV1.7-alpha-only/
 # -rw-r--r--  model_004_seed_019.r6.pdb
 ```
 
-We provide two scripts under `scripts/`:
-- `calculate_distances.py` → computes atom–atom distances defined in a **metrics** file.  
-- `subset_plddt.py` → computes average pLDDT on residue **subsets** defined in a **regions** file.  
+### Available analysis scripts
+All scripts live in `scripts/`:
 
-Both scripts take:
-- `--source` → the directory with all the PDBs to analyze.  
-- A second argument file:  
-  - `--metrics <file>` specifying atom pairs for distance calculations of residue ranges for subset pLDDT calculation
+| Script | What it computes | Inputs | Output |
+|--------|-----------------|--------|--------|
+| `calculate_distances.py` | Atom–atom distances using a metrics file | `--source`, `--metrics` | `distances.csv` |
+| `subset_plddt.py` | Average pLDDT on residue subsets | `--source`, `--regions` | `subset_plddt.csv` |
+| `rmsd.py` | RMSD vs. one or more reference PDBs | `<models_dir> <REF1> [REF2…]` | `rmsd.csv` |
+| `iptm.py` | Extracts ipTM scores from ColabFold JSON dump | `--source <folder_with_json>` | `iptm.csv` |
+| `iptm_log.py` | Extracts ipTM and recycle index from ColabFold `.log` | `--source <logfile>` | `iptm_by_log.csv` |
 
-> **Note on tags.** Each line in the input TXT defines a **tag** that becomes the column name in the resulting CSV. Use stable, descriptive tags (e.g., `VSDI`, `VSDII`, `AG1`, `IFM`, `SF`, `plddt_VSDI`, …).
+#### Python packages
+- numpy
+- pandas
+- tqdm
+- tap
+- matplotlib
+- pyrosetta (for calculate_distances and subset_plddt)
+- chimerax (for rmsd.py)
+
+
+### Example usage
+
+#### Distances
+```bash
+python scripts/calculate_distances.py \
+    --source outputs/hNaV1.7-alpha-only \
+    --metrics metrics.txt
+```
+*See structure of `metrics.txt` in section **4.1 Distance coordinates** below.*
+
+
+#### pLDDT subsets
+```bash
+python scripts/subset_plddt.py \
+    --source outputs/hNaV1.7-alpha-only \
+    --regions regions.txt
+```
+
+*See structure of `regions.txt` in section **4.2 pLDDT subsets** below.*
+
+#### RMSD to reference structure(s)
+```bash
+# One reference
+python scripts/rmsd.py outputs/hNaV1.7-alpha-only 7DTD
+
+# Multiple references
+python scripts/rmsd.py outputs/hNaV1.7-alpha-only 7DTD 6J8E
+```
+
+#### Extract ipTM values
+From JSON metadata:
+```bash
+python scripts/iptm.py --source outputs/hNaV1.7-alpha-only
+```
+
+From a run log:
+```bash
+python scripts/iptm_log.py --source outputs/hNaV1.7-alpha-only/log.txt
+```
+
+### About tags
+Each line in the input TXT defines a **tag** that becomes the column name in the resulting CSV. Use stable, descriptive tags (e.g., `VSDI`, `VSDII`, `AG1`, `IFM`, `SF`, `plddt_VSDI`, …).
 
 ### 4.1 Distance coordinates
 
@@ -266,3 +333,49 @@ filename,plddt_full,plddt_VSDI,plddt_VSDII,plddt_VSDIII,plddt_VSDIV,plddt_AG,pld
 This mirrors the structure of example_outputs/NaV1.1-alphaOnly.csv provided in the repository (columns may vary with your chosen tag names).
 
 >**Tip**. Keep your tag names consistent across cases (e.g., always VSDI, VSDII, AG1, IFM, SF, plddt_VSDI, …) so merged datasets from different study cases are directly comparable.
+
+
+
+## 5. Correlation and clustering analysis
+
+This repository includes ready-to-run Jupyter notebooks and the **final analysis tables** used in the paper. The folder layout is:
+
+```
+correlation_analysis/
+├─ AlphaOnly/
+│  ├─ Correlations-final.ipynb
+│  └─ data/   # final per-model tables (CSV) for α-subunits only
+├─ Betas/
+│  ├─ Correlations-final.ipynb
+│  └─ data/   # final per-model tables (CSV) for α+β complexes and corresponding α-subunits only as reference
+└─ CaM/
+   ├─ Correlations-final.ipynb
+   └─ data/   # final per-model tables (CSV) for α+CaM complexes and corresponding α-subunits only as reference
+
+clustering_analysis/
+├─ clustering-final.ipynb
+└─ data/   # combined tables used for joint clustering/UMAP
+```
+
+- The **`data/`** subfolders contain the **final CSV tables** produced in this study (e.g., `NaV1.7-alphaOnly.csv`, `NaV1.1-beta1.csv`). Each row is a single model; columns include distance-based state coordinates (e.g., VSDI–VSDIV, AG1/AG2, IFM, SF), confidence metrics (global and subset **pLDDT**), **RMSDs to experimental reference structures**, and metadata such as `filename` (from which the recycle index can be extracted).
+- The notebooks (`*final.ipynb`) are configured to **run out-of-the-box** using the corresponding `data/` CSVs to reproduce the **figures and statistics** reported in the paper (correlations, mutual information heatmaps, recycle trends, etc.). Minimal editing should be required beyond adjusting paths if you move the repository.
+
+
+## 6. Data availability & model retrieval
+
+- The complete **3D model ensembles** for all cases will be available on **Dryad**: *[DOI link placeholder]*. Each Dryad package mirrors this repository’s case naming (e.g., `hNaV1.7-alpha-only`).
+- Using the CSVs in the folders above, the community can **search for specific models** (desired state coordinates and confidence) and then retrieve the corresponding PDB from the Dryad bundle.
+
+**Example workflow (NaV1.7 α-subunit only):**
+1. Download the Dryad bundle for *NaV1.7 α-only* models.
+2. Open `correlation_analysis/AlphaOnly/data/NaV1.7-alphaOnly.csv`.
+3. Filter by column values to locate models with the features you need, e.g.:
+   - `VSDII < 13` (more deactivated VSDII)
+   - `IFM < 10` (IFM bound)
+   - `AG_area` between `160` and `190` Å² (narrow/closed–like gate)
+   - `plddt_VSDII > 80` (high confidence in VSDII)
+4. Use the `filename` column to find the exact PDB file in the Dryad package (e.g., `model_000_seed_012.r0.pdb`).
+
+> Tip: keep tags/column names consistent across cases (e.g., `VSDI–VSDIV`, `AG1/AG2`, `IFM`, `SF`, `AG_area`, `plddt_*`, `recycle`) so that filtering and cross-case comparisons are straightforward.
+
+
