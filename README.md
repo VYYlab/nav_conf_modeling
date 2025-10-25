@@ -29,7 +29,7 @@ The workflow is divided into four stages:
 All sequences used in this study are provided in this repository under `references/input-sequences.csv`. These correspond to the twenty study cases described in the manuscript, which include NaV1.1 to NaV1.9, and NaX α-subunits, as well as complexes with β-subunits (β1–β4) and calmodulin.  
 
 
-All sequences were retrieved from UniProt (see `references/input-sequences.csv` table accession codes). For multimeric complexes, the sequences of the partners are included in the input FASTA file on the same line, separated by a colon (`:`). This is the syntax required by AlphaFold/ColabFold to interpret the proteins as interacting partners.
+All sequences were retrieved from UniProt (see `references/input-sequences.csv` table for accession codes). For multimeric complexes, the sequences of the partners are included in the input FASTA file on the same line, separated by a colon (`:`). This is the syntax required by AlphaFold/ColabFold to interpret the proteins as interacting partners.
 
 ---
 
@@ -200,7 +200,7 @@ colabfold_batch --num-models 5 --model-type auto --msa-mode mmseqs2_uniref_env \
 inputs/hNaV1.7-beta1.fa outputs/hNaV1.7-beta1/
 ```
 
-The resulting output folder will contain the full multimeric complex predictions, including one model file per recycle iteration (e.g., `...r0.pdb`, `...r6.pdb`) for each model and random seed.
+The resulting output folder will contain the full multimeric complex predictions, including one model PDB file per recycle iteration (e.g., `...r0.pdb`, `...r6.pdb`). The NaV α-subunit will be chain "A" and the partner will be chain "B".
 
 
 ## 4. Analyze models
