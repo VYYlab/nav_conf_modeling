@@ -29,7 +29,7 @@ The workflow is divided into four stages:
 All sequences used in this study are provided in this repository under `references/input-sequences.csv`. These correspond to the twenty study cases described in the manuscript, which include NaV1.1 to NaV1.9, and NaX α-subunits, as well as complexes with β-subunits (β1–β4) and calmodulin.  
 
 
-All sequences were retrieved from UniProt (see `references/input-sequences.csv` table for accession codes). For multimeric complexes, the sequences of the partners are included in the input FASTA file on the same line, separated by a colon (`:`). This is the syntax required by AlphaFold/ColabFold to interpret the proteins as interacting partners.
+All sequences were retrieved from UniProt (see `references/input-sequences.csv` table for all sequences and accession codes used in this study). For multimeric complexes, the sequences of the partners are included in the input FASTA file on the same line, separated by a colon (`:`). This is the syntax required by AlphaFold/ColabFold to interpret the proteins as interacting partners.
 
 ---
 
@@ -56,7 +56,7 @@ In order to assign NaV channel models to specific conformational states, we anal
   Distance between the Cα of the lysine and aspartate residues of the DEKA motif.  
   - Variations reflect dilation or constriction of the selectivity filter, associated with slow inactivation.
 
-To benchmark the models, the same distances were also measured in available experimental structures of human NaV channels and selected non-human NaV channels representing distinct conformational states.
+To benchmark the models, the same distances were also measured in available experimental structures of human NaV channels and selected non-human NaV channels representing distinct conformational states (see `references/reference-experimental-structures.csv` table).
 
 
 ![Regions of interest in NaV channels](figures/Figure1.png)
