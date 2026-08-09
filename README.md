@@ -49,7 +49,7 @@ In order to assign NaV channel models to specific conformational states, we anal
   These values indicate whether the pore is open or closed.
 
 - **Fast inactivation (IFM motif):**  
-  Distance between the Cα of the phenylalanine in the IFM motif and the Cα of the aspartate in its binding site in the pore domain.  
+  Distance between the Cα of the phenylalanine in the IFM motif and the Cα of the asparagine in its binding site in the pore domain.  
   - Low values → IFM motif bound, channel in fast-inactivated state.  
 
 - **Selectivity filter (SF):**  
@@ -72,7 +72,7 @@ All distances and residue subsets used in this study are summarized in `referenc
 - **Modeling case**: Channel subtype (e.g., NaV1.1, NaV1.2, NaV1.7).  
 - **VSDI, VSDII, VSDIII, VSDIV**: Atom pairs defining the GC1–HC distances for each VSD.  
 - **AG1, AG2**: Atom pairs defining the activation gate distances (S6I–S6III and S6II–S6IV).  
-- **IFM**: Atom pair between IFM phenylalanine and the aspartate in the pore binding site.  
+- **IFM**: Atom pair between IFM phenylalanine and the asparagine in the pore binding site.  
 - **SF**: Atom pair within the DEKA motif to monitor selectivity filter dilation.  
 - **plddt full**: Residue ranges covering the entire α-subunit excluding unstructured flexible loops, used for overall pLDDT averaging.  
 - **plddt VSDI–VSDIV**: Residue ranges defining each VSD for regional pLDDT analysis.  
